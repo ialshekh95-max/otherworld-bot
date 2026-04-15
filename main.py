@@ -6,7 +6,7 @@ from telegram.ext import ApplicationBuilder, CommandHandler, CallbackQueryHandle
 TOKEN = os.getenv("BOT_TOKEN")
 ADMIN_ID = int(os.getenv("ADMIN_ID"))
 
-# ===== STORAGE =====
+# ===== DATA =====
 gift_codes = set()
 used_codes = set()
 free_users = set()
@@ -25,26 +25,26 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         reply_markup=InlineKeyboardMarkup(keyboard)
     )
 
-# ===== BUTTONS =====
+# ===== BUTTON HANDLER =====
 async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
 
     user_id = query.from_user.id
 
-    # 🎁 Gift code mode
+    # 🎁 gift code mode
     if query.data == "gift":
         context.user_data["gift_mode"] = True
         await query.message.reply_text("🎁 أرسل كود الهدية الآن:")
         return
 
-    # 🎉 Free access
+    # 🎉 free access check
     if user_id in free_users:
         free_users.remove(user_id)
         await query.message.reply_text("🎉 لديك خدمة مجانية واحدة! اكتب طلبك 🔮")
         return
 
-    # 💳 Payment info
+    # 💳 payment info
     await query.message.reply_text(
         "💳 الدفع مطلوب:\n\n"
         "USDT BEP20:\n"
@@ -62,7 +62,7 @@ async def handle(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.message.from_user.id
     text = update.message.text.strip()
 
-    # ===== GIFT CODE CHECK =====
+    # ===== GIFT CODE SYSTEM =====
     if context.user_data.get("gift_mode"):
         context.user_data["gift_mode"] = False
 
@@ -81,8 +81,9 @@ async def handle(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         return
 
-    # ===== ADMIN =====
+    # ===== ADMIN COMMANDS =====
     if user_id == ADMIN_ID:
+
         # create gift code
         if text.startswith("code "):
             code = text.replace("code ", "").strip()
