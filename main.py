@@ -29,9 +29,9 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = query.from_user.id
 
     if query.data == "gift":
-        await query.message.reply_text("🎁 أرسل كود الهدية الآن:")
-        context.user_data["gift_mode"] = True
-        return
+    context.user_data["gift_mode"] = True
+    await query.message.reply_text("🎁 أرسل كود الهدية الآن:")
+    return
 
     if user_id in free_users:
         free_users.remove(user_id)
