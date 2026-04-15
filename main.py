@@ -6,7 +6,7 @@ from telegram.ext import ApplicationBuilder, CommandHandler, CallbackQueryHandle
 TOKEN = os.getenv("BOT_TOKEN")
 ADMIN_ID = int(os.getenv("ADMIN_ID"))
 
-# ===== DATA =====
+# ===== STORAGE =====
 gift_codes = set()
 used_codes = set()
 free_users = set()
@@ -25,26 +25,23 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         reply_markup=InlineKeyboardMarkup(keyboard)
     )
 
-# ===== BUTTON HANDLER =====
+# ===== BUTTON =====
 async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
 
     user_id = query.from_user.id
 
-    # 🎁 gift code mode
     if query.data == "gift":
         context.user_data["gift_mode"] = True
         await query.message.reply_text("🎁 أرسل كود الهدية الآن:")
         return
 
-    # 🎉 free access check
     if user_id in free_users:
         free_users.remove(user_id)
         await query.message.reply_text("🎉 لديك خدمة مجانية واحدة! اكتب طلبك 🔮")
         return
 
-    # 💳 payment info
     await query.message.reply_text(
         "💳 الدفع مطلوب:\n\n"
         "USDT BEP20:\n"
@@ -62,9 +59,14 @@ async def handle(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.message.from_user.id
     text = update.message.text.strip()
 
-    # ===== GIFT CODE SYSTEM =====
-    if context.user_data.get("gift_mode"):
+    # ===== DEBUG (مهم) =====
+    print("MESSAGE RECEIVED:", text)
+
+    # ===== GIFT MODE =====
+    if context.user_data.get("gift_mode") == True:
         context.user_data["gift_mode"] = False
+
+        print("GIFT CODE RECEIVED:", text)
 
         if text in used_codes:
             await update.message.reply_text("❌ الكود مستخدم مسبقاً")
@@ -81,17 +83,15 @@ async def handle(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         return
 
-    # ===== ADMIN COMMANDS =====
+    # ===== ADMIN =====
     if user_id == ADMIN_ID:
 
-        # create gift code
         if text.startswith("code "):
             code = text.replace("code ", "").strip()
             gift_codes.add(code)
             await update.message.reply_text(f"🎁 تم إنشاء كود: {code}")
             return
 
-        # send message to user
         parts = text.split("|")
         if len(parts) == 2:
             target = int(parts[0])
