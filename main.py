@@ -182,8 +182,8 @@ def is_rate_limited(user_id: int) -> bool:
     return False
 
 # ===== CONFIG =====
-TOKEN = os.getenv("BOT_TOKEN")
-ADMIN_ID = int(os.getenv("ADMIN_ID"))
+TOKEN ="8422615061:AAG46q08Hu39up9OElcHmb0u4gvVYIiQreI"
+ADMIN_ID ="8345835699"
 
 # ===== PERSISTENCE =====
 DATA_FILE = "data.json"
